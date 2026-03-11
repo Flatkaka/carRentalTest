@@ -15,7 +15,7 @@ async function CarDetailContent({ paramsPromise }: { paramsPromise: Promise<{ id
 
   const { data: car } = await supabase
     .from("cars")
-    .select("*, car_images(*)")
+    .select("*, car_images(*), owner:users(id, full_name, email, avatar_url)")
     .eq("id", id)
     .single();
 
@@ -40,6 +40,7 @@ async function CarDetailContent({ paramsPromise }: { paramsPromise: Promise<{ id
                 src={images[0].url}
                 alt={`${typedCar.make} ${typedCar.model}`}
                 fill
+                unoptimized
                 className="object-cover"
                 priority
               />
@@ -50,6 +51,7 @@ async function CarDetailContent({ paramsPromise }: { paramsPromise: Promise<{ id
                   src={img.url}
                   alt={`Photo ${i + 2}`}
                   fill
+                  unoptimized
                   className="object-cover"
                 />
               </div>
@@ -108,6 +110,19 @@ async function CarDetailContent({ paramsPromise }: { paramsPromise: Promise<{ id
           <div>
             <h2 className="text-xl font-semibold mb-2">About this car</h2>
             <p className="text-muted-foreground leading-relaxed">{typedCar.description}</p>
+          </div>
+        )}
+
+        {/* Owner */}
+        {typedCar.owner && (
+          <div className="flex items-center gap-3 p-4 border rounded-xl">
+            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center font-semibold text-sm flex-shrink-0">
+              {typedCar.owner.full_name?.[0]?.toUpperCase() ?? "?"}
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Hosted by</p>
+              <p className="font-medium">{typedCar.owner.full_name ?? typedCar.owner.email ?? "Unknown"}</p>
+            </div>
           </div>
         )}
 

@@ -21,6 +21,7 @@ export function CarCard({ car }: CarCardProps) {
               src={firstImage}
               alt={`${car.make} ${car.model}`}
               fill
+              unoptimized
               className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (

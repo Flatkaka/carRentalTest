@@ -22,7 +22,16 @@ async function CarsList({
     query = query.ilike("location", `%${location}%`);
   }
 
-  const { data: cars } = await query;
+  const { data: cars, error } = await query;
+
+  if (error) {
+    return (
+      <div className="text-center py-16 text-destructive">
+        <p className="font-medium">Failed to load cars</p>
+        <p className="text-sm mt-1">{error.message}</p>
+      </div>
+    );
+  }
 
   let filteredCars = (cars as Car[]) ?? [];
 

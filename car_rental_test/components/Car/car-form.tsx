@@ -97,11 +97,21 @@ export function CarForm({ car }: CarFormProps) {
 
     // Sync images
     if (carId) {
-      await supabase.from("car_images").delete().eq("car_id", carId);
+      const { error: deleteError } = await supabase.from("car_images").delete().eq("car_id", carId);
+      if (deleteError) {
+        setError(`Failed to update images: ${deleteError.message}`);
+        setLoading(false);
+        return;
+      }
       if (imageUrls.length > 0) {
-        await supabase.from("car_images").insert(
+        const { error: imgInsertError } = await supabase.from("car_images").insert(
           imageUrls.map((url, i) => ({ car_id: carId, url, order: i }))
         );
+        if (imgInsertError) {
+          setError(`Failed to save images: ${imgInsertError.message}`);
+          setLoading(false);
+          return;
+        }
       }
     }
 

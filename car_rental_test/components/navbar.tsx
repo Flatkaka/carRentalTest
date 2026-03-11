@@ -10,6 +10,16 @@ async function NavbarUserSection() {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
+  let displayName: string | null = null;
+  if (user?.sub) {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("username, full_name, email")
+      .eq("id", user.sub)
+      .single();
+    displayName = profile?.username || profile?.full_name || profile?.email || null;
+  }
+
   return (
     <div className="flex items-center gap-4">
       {user && (
@@ -24,7 +34,7 @@ async function NavbarUserSection() {
       )}
       {user ? (
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground hidden lg:block">{user.email}</span>
+          <Link href="/dashboard/profile" className="text-sm text-muted-foreground hidden lg:block hover:text-foreground transition-colors">{displayName}</Link>
           <LogoutButton />
         </div>
       ) : (

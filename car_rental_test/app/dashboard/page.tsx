@@ -6,16 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CancelBookingButton } from "@/components/cancel-booking-button";
 import { MapPin, Plus, Pencil } from "lucide-react";
-import type { Booking, Car } from "@/lib/types";
-
-const statusColors: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-  confirmed: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-  completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-};
+import { DashboardTabs } from "@/components/dashboard-tabs";
+import type { Car, UserProfile } from "@/lib/types";
 
 async function DashboardContent() {
   const supabase = await createClient();
@@ -27,81 +20,31 @@ async function DashboardContent() {
 
   const userId = claims.claims.sub;
 
-  const [{ data: bookings }, { data: myCars }] = await Promise.all([
-    supabase
-      .from("bookings")
-      .select("*, cars(*, car_images(*))")
-      .eq("renter_id", userId)
-      .order("created_at", { ascending: false }),
+  const [{ data: myCars }, { data: profile }] = await Promise.all([
     supabase
       .from("cars")
       .select("*, car_images(*)")
       .eq("owner_id", userId)
       .order("created_at", { ascending: false }),
+    supabase.from("users").select("*").eq("id", userId).single(),
   ]);
+
+  const typedProfile = profile as UserProfile | null;
 
   return (
     <>
-      {/* My Trips */}
-      <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4">My Trips</h2>
-        {!bookings || bookings.length === 0 ? (
-          <div className="text-center py-10 text-muted-foreground border rounded-xl">
-            <p>No trips yet.</p>
-            <Button asChild variant="link" className="mt-2">
-              <Link href="/cars">Browse cars to rent</Link>
-            </Button>
+      {/* Profile header */}
+      {typedProfile && (
+        <div className="flex items-center gap-4 mb-10 p-5 border rounded-xl">
+          <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold text-primary flex-shrink-0">
+            {(typedProfile.username ?? typedProfile.full_name ?? typedProfile.email ?? "?")?.[0]?.toUpperCase()}
           </div>
-        ) : (
-          <div className="space-y-4">
-            {(bookings as Booking[]).map((booking) => {
-              const car = booking.cars;
-              if (!car) return null;
-              const firstImage = car.car_images?.[0]?.url;
-              return (
-                <Card key={booking.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="flex flex-col sm:flex-row">
-                      <div className="relative w-full sm:w-40 h-32 sm:h-auto bg-muted flex-shrink-0">
-                        {firstImage ? (
-                          <Image src={firstImage} alt={`${car.make} ${car.model}`} fill className="object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>
-                        )}
-                      </div>
-                      <div className="flex-1 p-4 flex flex-col justify-between gap-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <Link href={`/cars/${car.id}`} className="font-semibold hover:underline">
-                              {car.year} {car.make} {car.model}
-                            </Link>
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
-                              <MapPin className="h-3 w-3" />
-                              {car.location}
-                            </div>
-                          </div>
-                          <span className={`text-xs font-medium px-2 py-1 rounded-full capitalize ${statusColors[booking.status] ?? ""}`}>
-                            {booking.status}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">
-                            {booking.start_date} → {booking.end_date}
-                          </span>
-                          <span className="font-semibold">${booking.total_price}</span>
-                        </div>
-                        {booking.status === "pending" && (
-                          <CancelBookingButton bookingId={booking.id} />
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          <div>
+            <p className="font-semibold text-lg">{typedProfile.username ?? typedProfile.full_name ?? "No username set"}</p>
+            <p className="text-sm text-muted-foreground">{typedProfile.email}</p>
           </div>
-        )}
-      </section>
+        </div>
+      )}
 
       {/* My Cars */}
       <section>
@@ -128,7 +71,7 @@ async function DashboardContent() {
                 <Card key={car.id} className="overflow-hidden">
                   <div className="relative h-36 bg-muted">
                     {firstImage ? (
-                      <Image src={firstImage} alt={`${car.make} ${car.model}`} fill className="object-cover" />
+                      <Image src={firstImage} alt={`${car.make} ${car.model}`} fill unoptimized className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>
                     )}
@@ -164,6 +107,7 @@ export default function DashboardPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+      <DashboardTabs />
       <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded-xl" />}>
         <DashboardContent />
       </Suspense>

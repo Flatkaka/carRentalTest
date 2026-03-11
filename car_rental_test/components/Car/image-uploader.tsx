@@ -27,7 +27,7 @@ export function ImageUploader({ value, onChange }: ImageUploaderProps) {
       const ext = file.name.split(".").pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error } = await supabase.storage
-        .from("car-images")
+        .from("car_images")
         .upload(fileName, file, { upsert: false });
 
       if (error) {
@@ -37,7 +37,7 @@ export function ImageUploader({ value, onChange }: ImageUploaderProps) {
       }
 
       const { data: urlData } = supabase.storage
-        .from("car-images")
+        .from("car_images")
         .getPublicUrl(fileName);
       newUrls.push(urlData.publicUrl);
     }

@@ -1,3 +1,14 @@
+export interface UserProfile {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  username: string | null;
+  phone: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CarImage {
   id: string;
   car_id: string;
@@ -7,7 +18,7 @@ export interface CarImage {
 }
 
 export interface Car {
-  id: string;
+  id: number;
   owner_id: string;
   make: string;
   model: string;
@@ -23,11 +34,12 @@ export interface Car {
   status: string;
   created_at: string;
   car_images?: CarImage[];
+  owner?: UserProfile;
 }
 
 export interface Booking {
   id: string;
-  car_id: string;
+  car_id: number;
   renter_id: string;
   start_date: string;
   end_date: string;
