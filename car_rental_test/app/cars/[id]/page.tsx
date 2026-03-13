@@ -115,7 +115,7 @@ async function CarDetailContent({ paramsPromise }: { paramsPromise: Promise<{ id
 
         {/* Owner */}
         {typedCar.owner && (
-          <div className="flex items-center gap-3 p-4 border rounded-xl">
+          <Link href={`/users/${typedCar.owner_id}`} className="flex items-center gap-3 p-4 border rounded-xl hover:bg-muted/50 transition-colors">
             <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center font-semibold text-sm flex-shrink-0">
               {typedCar.owner.full_name?.[0]?.toUpperCase() ?? "?"}
             </div>
@@ -123,7 +123,7 @@ async function CarDetailContent({ paramsPromise }: { paramsPromise: Promise<{ id
               <p className="text-xs text-muted-foreground">Hosted by</p>
               <p className="font-medium">{typedCar.owner.full_name ?? typedCar.owner.email ?? "Unknown"}</p>
             </div>
-          </div>
+          </Link>
         )}
 
         {/* Insurance details */}

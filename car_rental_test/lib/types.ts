@@ -5,6 +5,7 @@ export interface UserProfile {
   avatar_url: string | null;
   username: string | null;
   phone: string | null;
+  is_admin: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -32,6 +33,7 @@ export interface Car {
   is_insured: boolean;
   insurance_details: string | null;
   status: string;
+  blocked_dates?: { start: string; end: string }[];
   created_at: string;
   car_images?: CarImage[];
   owner?: UserProfile;

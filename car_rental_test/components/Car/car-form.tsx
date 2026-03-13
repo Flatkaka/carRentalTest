@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ImageUploader } from "@/components/Car/image-uploader";
+import { LocationPicker } from "@/components/Car/location-picker";
 import type { Car } from "@/lib/types";
 
 interface CarFormProps {
@@ -174,30 +175,27 @@ export function CarForm({ car }: CarFormProps) {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="price_per_day">Price per day ($) *</Label>
-          <Input
-            id="price_per_day"
-            type="number"
-            value={form.price_per_day}
-            onChange={(e) => set("price_per_day", e.target.value)}
-            placeholder="75"
-            min="1"
-            step="0.01"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="location">Location *</Label>
-          <Input
-            id="location"
-            value={form.location}
-            onChange={(e) => set("location", e.target.value)}
-            placeholder="e.g. San Francisco, CA"
-            required
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="price_per_day">Price per day ($) *</Label>
+        <Input
+          id="price_per_day"
+          type="number"
+          value={form.price_per_day}
+          onChange={(e) => set("price_per_day", e.target.value)}
+          placeholder="75"
+          min="1"
+          step="0.01"
+          required
+          className="max-w-xs"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Location *</Label>
+        <LocationPicker
+          value={form.location}
+          onChange={(loc) => set("location", loc)}
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

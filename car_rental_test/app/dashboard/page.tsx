@@ -85,7 +85,14 @@ async function DashboardContent() {
                           <span className="truncate">{car.location}</span>
                         </div>
                       </div>
-                      <Badge variant="secondary" className="text-xs flex-shrink-0">${car.price_per_day}/day</Badge>
+                      <div className="flex flex-col items-end gap-1">
+                        <Badge variant="secondary" className="text-xs">${car.price_per_day}/day</Badge>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${
+                          car.status === "active" ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
+                          car.status === "pending" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" :
+                          "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                        }`}>{car.status}</span>
+                      </div>
                     </div>
                     <Button asChild variant="outline" size="sm" className="w-full mt-3">
                       <Link href={`/cars/${car.id}/edit`}>

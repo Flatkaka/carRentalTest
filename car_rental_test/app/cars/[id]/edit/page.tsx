@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { CarForm } from "@/components/Car/car-form";
+import { BlockedDatesEditor } from "@/components/Car/blocked-dates-editor";
 import type { Car } from "@/lib/types";
 
 async function EditCarContent({ paramsPromise }: { paramsPromise: Promise<{ id: string }> }) {
@@ -29,6 +30,17 @@ async function EditCarContent({ paramsPromise }: { paramsPromise: Promise<{ id: 
       </p>
       <div className="mt-6">
         <CarForm car={typedCar} />
+      </div>
+
+      <div className="mt-10 max-w-2xl">
+        <h2 className="text-xl font-semibold mb-1">Blocked Dates</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Block specific date ranges to prevent bookings during those periods.
+        </p>
+        <BlockedDatesEditor
+          carId={typedCar.id}
+          initial={typedCar.blocked_dates ?? []}
+        />
       </div>
     </>
   );

@@ -11,13 +11,15 @@ async function NavbarUserSection() {
   const user = data?.claims;
 
   let displayName: string | null = null;
+  let isAdmin = false;
   if (user?.sub) {
     const { data: profile } = await supabase
       .from("users")
-      .select("username, full_name, email")
+      .select("username, full_name, email, is_admin")
       .eq("id", user.sub)
       .single();
     displayName = profile?.username || profile?.full_name || profile?.email || null;
+    isAdmin = profile?.is_admin ?? false;
   }
 
   return (
@@ -30,6 +32,11 @@ async function NavbarUserSection() {
           <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Dashboard
           </Link>
+          {isAdmin && (
+            <Link href="/admin" className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+              Admin
+            </Link>
+          )}
         </>
       )}
       {user ? (

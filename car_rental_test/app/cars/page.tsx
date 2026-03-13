@@ -45,7 +45,15 @@ async function CarsList({
       .gte("end_date", from);
 
     const bookedIds = new Set((bookedCarIds ?? []).map((b: { car_id: string }) => b.car_id));
-    filteredCars = filteredCars.filter((c) => !bookedIds.has(c.id));
+
+    const fromDate = from.slice(0, 10);
+    const toDate = to.slice(0, 10);
+
+    filteredCars = filteredCars.filter((c) => {
+      if (bookedIds.has(c.id)) return false;
+      const blocked = c.blocked_dates ?? [];
+      return !blocked.some((r) => fromDate <= r.end && toDate >= r.start);
+    });
   }
 
   if (filteredCars.length === 0) {

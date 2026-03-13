@@ -49,10 +49,11 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // Public paths: /, /auth/*, /cars (but NOT /cars/new or /cars/*/edit)
+  // Public paths: /, /auth/*, /cars (but NOT /cars/new or /cars/*/edit), /users/*
   const isPublic =
     pathname === "/" ||
     pathname.startsWith("/auth") ||
+    pathname.startsWith("/users") ||
     (pathname.startsWith("/cars") &&
       pathname !== "/cars/new" &&
       !pathname.endsWith("/edit"));

@@ -20,14 +20,18 @@ function daysBetween(a: string, b: string) {
 
 export function BookingWidget({ car, userId }: BookingWidgetProps) {
   const router = useRouter();
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  now.setMinutes(0, 0, 0);
+  const todayLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
 
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const days = from && to && to > from ? daysBetween(from, to) : 0;
+  const days = from && to && to > from ? Math.ceil(daysBetween(from, to)) : 0;
   const total = days * car.price_per_day;
 
   async function handleBook() {
@@ -43,6 +47,17 @@ export function BookingWidget({ car, userId }: BookingWidgetProps) {
     setError("");
 
     const supabase = createClient();
+
+    // Check against owner-blocked dates
+    const fromDate = from.slice(0, 10);
+    const toDate = to.slice(0, 10);
+    const blocked = car.blocked_dates ?? [];
+    const blockedOverlap = blocked.some((r) => fromDate <= r.end && toDate >= r.start);
+    if (blockedOverlap) {
+      setError("The owner has blocked this car during part of your selected dates.");
+      setLoading(false);
+      return;
+    }
 
     // Check for overlapping bookings
     const { data: overlaps } = await supabase
@@ -94,9 +109,9 @@ export function BookingWidget({ car, userId }: BookingWidgetProps) {
             </Label>
             <input
               id="from-date"
-              type="date"
+              type="datetime-local"
               value={from}
-              min={today}
+              min={todayLocal}
               onChange={(e) => setFrom(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
@@ -107,9 +122,9 @@ export function BookingWidget({ car, userId }: BookingWidgetProps) {
             </Label>
             <input
               id="to-date"
-              type="date"
+              type="datetime-local"
               value={to}
-              min={from || today}
+              min={from || todayLocal}
               onChange={(e) => setTo(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
