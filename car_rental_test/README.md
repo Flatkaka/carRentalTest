@@ -1,109 +1,127 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# Car Rental App
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
-
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+A full-stack car rental platform built with Next.js 15, Supabase, and Tailwind CSS.
 
 ## Features
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Proxy
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+- **Browse cars** — search by location, filter by availability, dates, fuel type, and transmission
+- **Car detail pages** — image gallery, specs, and booking widget with date picker
+- **Bookings** — create, view, and cancel bookings from your dashboard
+- **Interactive map** — Mapbox-powered map view with price-pill markers, car list sidebar, and detail panel
+- **Admin panel** — manage cars and view all bookings
+- **Auth** — email/password sign-up and login with Supabase Auth (cookie-based sessions)
+- **Image uploads** — car images stored in Supabase Storage
+- **Dark/light mode** — via next-themes
 
-## Demo
+## Tech Stack
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+- [Next.js 15](https://nextjs.org) (App Router)
+- [Supabase](https://supabase.com) (Postgres, Auth, Storage)
+- [Tailwind CSS](https://tailwindcss.com)
+- [shadcn/ui](https://ui.shadcn.com)
+- [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/)
+- [lucide-react](https://lucide.dev)
 
-## Deploy to Vercel
+## Getting Started
 
-Vercel deployment will guide you through creating a Supabase account and project.
+1. **Create a Supabase project** at [database.new](https://database.new)
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
-
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
-
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
-
-## Clone and run locally
-
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
-
-2. Create a Next.js app using the Supabase Starter template npx command
+2. **Clone the repo and install dependencies**
 
    ```bash
-   npx create-next-app --example with-supabase with-supabase-app
+   git clone <repo-url>
+   cd car_rental_test
+   npm install
    ```
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
+3. **Set up environment variables** — create `.env.local`:
+
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-supabase-anon-key
+   NEXT_PUBLIC_MAPBOX_TOKEN=your-mapbox-token
    ```
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
+4. **Set up the database** — run the following SQL in your Supabase dashboard:
+
+   ```sql
+   -- Cars table
+   create table cars (
+     id bigint primary key generated always as identity,
+     owner_id uuid references auth.users not null,
+     make text not null,
+     model text not null,
+     year int not null,
+     description text,
+     price_per_day numeric not null,
+     location text not null,
+     seats int not null default 5,
+     transmission text not null default 'automatic',
+     fuel_type text not null default 'petrol',
+     is_insured boolean not null default false,
+     insurance_details text,
+     status text not null default 'active',
+     blocked_dates jsonb default '[]',
+     created_at timestamptz default now()
+   );
+
+   -- Car images table
+   create table car_images (
+     id uuid primary key default gen_random_uuid(),
+     car_id bigint references cars on delete cascade,
+     url text not null,
+     "order" int not null default 0,
+     created_at timestamptz default now()
+   );
+
+   -- Bookings table
+   create table bookings (
+     id uuid primary key default gen_random_uuid(),
+     car_id bigint references cars on delete cascade,
+     renter_id uuid references auth.users not null,
+     start_date date not null,
+     end_date date not null,
+     total_price numeric not null,
+     status text not null default 'pending',
+     created_at timestamptz default now()
+   );
    ```
 
-3. Use `cd` to change into the app's directory
+5. **Create a Supabase Storage bucket** named `car-images` and set it to **public**.
 
-   ```bash
-   cd with-supabase-app
-   ```
-
-4. Rename `.env.example` to `.env.local` and update the following:
-
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
-  ```
-  > [!NOTE]
-  > This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-  > Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-  > See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
-
-  Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
-
-5. You can now run the Next.js local development server:
+6. **Run the dev server**
 
    ```bash
    npm run dev
    ```
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+   Open [http://localhost:3000](http://localhost:3000).
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+## Project Structure
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+```
+app/
+  page.tsx          # Home — hero + featured cars
+  cars/
+    page.tsx        # Browse & filter cars
+    [id]/page.tsx   # Car detail + booking
+    new/page.tsx    # Add a new car (owner)
+    [id]/edit/      # Edit a car
+  map/page.tsx      # Interactive map view
+  dashboard/        # User bookings dashboard
+  admin/            # Admin panel
+  auth/             # Login, sign-up, password reset
 
-## Feedback and issues
+components/
+  navbar.tsx
+  car-card.tsx
+  search-bar.tsx
+  booking-widget.tsx
+  cars-map.tsx
+  car-form.tsx
+  image-uploader.tsx
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
-
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+lib/
+  types.ts          # Car, Booking, UserProfile interfaces
+  supabase/         # Server, client, and proxy Supabase clients
+```

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/components/logout-button";
-import { Car } from "lucide-react";
+import { Car, Map } from "lucide-react";
 
 async function NavbarUserSection() {
   const supabase = await createClient();
@@ -70,6 +70,9 @@ export function Navbar() {
             </Link>
             <Link href="/cars" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
               Browse Cars
+            </Link>
+            <Link href="/map" className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
+              <Map className="h-4 w-4 inline-block" /> Map
             </Link>
           </div>
           <Suspense fallback={<div className="h-9 w-40 rounded-md bg-muted animate-pulse" />}>
