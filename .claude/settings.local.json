@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(cd \"C:/Users/hilma/Desktop/projects/carRentalTest/car_rental_test\" && npx tsc --noEmit 2>&1)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Bash(mkdir:*)"
     ]
   }
 }
