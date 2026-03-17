@@ -44,7 +44,7 @@ async function CarsList({
       .lte("start_date", to)
       .gte("end_date", from);
 
-    const bookedIds = new Set((bookedCarIds ?? []).map((b: { car_id: string }) => b.car_id));
+    const bookedIds = new Set((bookedCarIds ?? []).map((b: { car_id: number }) => b.car_id));
 
     const fromDate = from.slice(0, 10);
     const toDate = to.slice(0, 10);
