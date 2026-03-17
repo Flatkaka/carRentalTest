@@ -119,7 +119,7 @@ export function CarsMap({ cars }: CarsMapProps) {
         const zoom = map.getZoom();
         const bounds = map.getBounds();
         markersRef.current.forEach(({ el, coords }) => {
-          const visible = zoom >= MIN_ZOOM && bounds.contains(coords);
+          const visible = zoom >= MIN_ZOOM && !!bounds?.contains(coords);
           el.style.display = visible ? "block" : "none";
         });
       }
