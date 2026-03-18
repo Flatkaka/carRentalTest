@@ -10,7 +10,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "DriveShare — Peer-to-Peer Car Rental",
+  title: "billgo — Car Rental",
   description: "Rent cars from locals or list your own car and earn money.",
 };
 

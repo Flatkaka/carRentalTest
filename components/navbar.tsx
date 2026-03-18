@@ -46,10 +46,10 @@ async function NavbarUserSection() {
         </div>
       ) : (
         <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/auth/login">Sign in</Link>
+          <Button asChild variant="ghost" size="sm" className="px-3">
+            <Link href="/auth/login">Log in</Link>
           </Button>
-          <Button asChild size="sm">
+          <Button asChild size="sm" className="px-3">
             <Link href="/auth/sign-up">Sign up</Link>
           </Button>
         </div>
@@ -66,7 +66,7 @@ export function Navbar() {
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
               <Car className="h-6 w-6" />
-              DriveShare
+              billgo
             </Link>
             <Link href="/cars" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
               Browse Cars
